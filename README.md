@@ -36,7 +36,7 @@ The source code of Laryngeal DIVA model, which combines DIVA model of speech mot
 4. For Auditory Adaptive Perturbation, you can run multiple trial length simulations. Set maximum perturbation magnitude (in Cents), and number of trials in each phase as propted. See Fig 4. 
 *Note: you should select the number of trials as the number of repeatitions in DIVA_GUI*
 
-![PitchAdapt](https://user-images.githubusercontent.com/13642912/142689722-15052c3a-cb42-45f1-a4b9-f1407cced91c.JPG)
+![PitchAdapt](https://user-images.githubusercontent.com/13642912/142690702-048cd25a-51f2-4f52-9b17-56e3c1e6cb76.JPG)
 <p align = "left"> <b>Figure 4. For Pitch Adaptive Perturbation: Setting Phases in adaptation paradigm and max perturbation magnitude in Auditory Perturbation block</b></p>
 
 ## Modifying Feedback and Feedforward Gains
