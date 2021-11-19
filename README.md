@@ -27,9 +27,14 @@ The source code of Laryngeal DIVA model, which combines DIVA model of speech mot
 
 ## Introducing perturbations to the model
 1. Auditory reflexive or auditory adaptive perturbations of vocal *f*o can be introduced by navigating to the simulink model and opening the **auditory perturbation** block.
+2. First select the Perturbation type
+3. For Auditory Reflexive Perturbation, you can run one reflexive trial simulation. Set perturbation magnitude (in Cents), perturbation duraiton, and perturbation onset as propted. See Fig 3.
 
 ![Fig_perturbationType](https://user-images.githubusercontent.com/13642912/142671793-964f0fac-fa97-48f7-b807-ec1032ec9b1a.JPG)
 <p align = "left"> <b>Figure 3. For Pitch Reflexive Perturbation: Setting perturbation magnitude, perturbation duration, and perturbation onset in Auditory Perturbation block</b></p>
+
+4. 3. For Auditory Adaptive Perturbation, you can run multiple trial length simulations. Set maximum perturbation magnitude (in Cents), and number of trials in each phase as propted. See Fig 4. 
+*Note: you should select the number of trials as the number of repeatitions in DIVA_GUI*
 
 ![Fig_perturbationType](https://user-images.githubusercontent.com/13642912/142671883-535e14af-2c44-4f14-87b3-1e88547039a9.JPG)
 <p align = "left"> <b>Figure 4. For Pitch Adaptive Perturbation: Setting Phases in adaptation paradigm and max perturbation magnitude in Auditory Perturbation block</b></p>
