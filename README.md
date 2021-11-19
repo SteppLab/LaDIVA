@@ -30,7 +30,7 @@ The source code of Laryngeal DIVA model, which combines DIVA model of speech mot
 2. First select the Perturbation type
 3. For Auditory Reflexive Perturbation, you can run one reflexive trial simulation. Set perturbation magnitude (in Cents), perturbation duraiton, and perturbation onset as propted. See Fig 3.
 
-![PitchReflex](https://user-images.githubusercontent.com/13642912/142689703-6c3aed73-c339-4db4-b7ea-f223a539ef33.JPG)
+![PitchReflex](https://user-images.githubusercontent.com/13642912/142690571-8db28e69-55a9-40dd-9f47-7879211a7dfa.JPG)
 <p align = "left"> <b>Figure 3. For Pitch Reflexive Perturbation: Setting perturbation magnitude, perturbation duration, and perturbation onset in Auditory Perturbation block</b></p>
 
 4. For Auditory Adaptive Perturbation, you can run multiple trial length simulations. Set maximum perturbation magnitude (in Cents), and number of trials in each phase as propted. See Fig 4. 
