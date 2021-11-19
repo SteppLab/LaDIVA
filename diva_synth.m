@@ -294,7 +294,7 @@ end
 
 if isempty(lookuptable)  % HW: call during gui initialization
    %load('BCMlookuptable.mat'); % Make sure you cal full path for this! TODO
-   load('BCMlookuptable_hires.mat'); 
+   load('BCMlookuptable.mat'); 
 end
 
 
