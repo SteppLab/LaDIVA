@@ -293,8 +293,8 @@ if isempty(vt) % JI: called during gui initialization
 end
 
 if isempty(lookuptable)  % HW: call during gui initialization
-   %load('BCMlookuptable.mat'); % Make sure you cal full path for this! TODO
-   load('BCMlookuptable_hires.mat'); 
+   load('BCMlookuptable.mat'); % Make sure you call full path for this! TODO
+   %load('BCMlookuptable_hires.mat'); 
 end
 
 
