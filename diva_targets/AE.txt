@@ -9,9 +9,9 @@ linear
 #F0_control
 0 
 #F0_min
-X 
+133.6394550 
 #F0_max
-X
+134.4147450 
 #F1_control
 0 
 #F1_min
@@ -53,7 +53,7 @@ X
 #PA_uvular_min
 -1 
 #PA_uvular_max
--0.3
+-0.3 
 #PA_velar_control
 0 
 #PA_velar_min

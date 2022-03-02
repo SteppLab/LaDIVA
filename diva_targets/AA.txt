@@ -1,7 +1,7 @@
 #name
 AA
 #length
-1050 
+3050 
 #wrapper
 0 
 #interpolation
@@ -9,9 +9,9 @@ linear
 #F0_control
 0 
 #F0_min
-133.6394550 
+133.5964797 
 #F0_max
-134.4147450 
+134.3715203 
 #F1_control
 0 
 #F1_min

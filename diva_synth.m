@@ -10,6 +10,12 @@ CT_tension = 11; TA_tension  = 12; subg_pressure  = 13;glt_voicing = 14;
 %Art= tanh(Art); HRW commented %max(-1,min(1,Art)); HRW 
 Art(1:10,:)= tanh(Art(1:10,:));%max(-1,min(1,Art));
 Art(glt_voicing,:)  = tanh(Art(glt_voicing,:));%max(-1,min(1,Art));
+
+%adding production  noise
+% mu = 0; sigma=1;
+% Art(11,:) =Art(11,:) + 0.025*normrnd(mu,sigma,1,length(Art(11,:)));
+% Art(12,:) =Art(12,:) + 0.025*normrnd(mu,sigma,1,length(Art(12,:)));
+
 %Art(13,:)= (Art(13,:)-10)/2010;%maxPs = 2010, minPs=10;
 switch(lower(option))
     case 'explicit' 
@@ -267,7 +273,7 @@ s=s(1:ceil(synth.fs*ndata*dt));
 s=s./max(abs(s));
 %s=(s -mean(s))./[(max(s)-min(s))/2];
 %audiowrite('pitchshift_8Hz_134_136range_09072020.wav',s,synth.fs);
-%audiowrite('AUDGAIN_0_5_PitchReflex_sustained_200cents_138HzBaseline_15Hzshift.wav',s,synth.fs);
+%audiowrite('AUDfbGAIN_0.1_PitchReflex_sustained_100cents_CaseB_AA.wav',s,synth.fs);
 end
 
 % computes auditory/somatosensory representations

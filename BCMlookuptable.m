@@ -86,7 +86,8 @@ for i = 9%1:1:length(Ps) % pressure
 %           output_param(i,j,k).SPL = SPL;
 %           
           
-          
+          lookuptable.F0(i,j,k) = F0;  %Ps, CT,TA
+          lookuptable.SPL(i,j,k) = SPL;
           
           output_param(j,k).Ug= Qg';
           output_param(j,k).Ag= Ag';

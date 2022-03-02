@@ -5,7 +5,7 @@ if ~nargin, option='init'; end
 
 switch(lower(option)),
     case {'init','simulation'}
-        if strcmp(lower(option),'simulation')&&DIVA_x.changed&&~strcmp(DIVA_x.production,'AA')&&~strcmp(DIVA_x.production,'AA')
+        if strcmp(lower(option),'simulation')&&DIVA_x.changed&&~strcmp(DIVA_x.production,'new@random')&&~strcmp(DIVA_x.production,'new@random')
             answ=questdlg({'Exiting the ''Targets'' tab without saving first will disregard','any unsaved edits to the current target','','Do you want to continue without saving?'},'','Yes (continue without saving)','No (save before continuing)','No (save before continuing)');
             if strcmp(answ,'No (save before continuing)')
                 diva_gui targetsgui_save
@@ -240,7 +240,7 @@ switch(lower(option)),
         set([DIVA_x.figure.handles.button2,DIVA_x.figure.handles.field1,DIVA_x.figure.handles.field2,DIVA_x.figure.handles.list3,DIVA_x.figure.handles.button5,DIVA_x.figure.handles.button7,DIVA_x.figure.handles.button8],'enable','off');
         set([DIVA_x.figure.handles.slider DIVA_x.figure.handles.slider_text],'visible','off');
         evalin('base','global DIVA_x');
-        
+        DIVA_x.count =1; 
         %DIVA_x.ff_gain = 1 ;
         %DIVA_x.fb_gain = 1;
         %DIVA_x.audfeedbackgain = 0.7;
@@ -267,109 +267,118 @@ switch(lower(option)),
         pertmagnitude_index = find(strcmp(dialogPrmNames,'perturbationsize')==1);
         pertmagnitude= get_param('diva/Auditory Perturbation', dialogPrmNames{pertmagnitude_index}); 
         pertmagnitude_matrix = str2num(pertmagnitude);
-        DIVA_x.pertmagnitudeCENT = pertmagnitude_matrix(1);
-         
-               baseline_Hz = 134.0271;               
-               targetcentdiff = baseline_Hz*(2^(DIVA_x.targetrangeCENT/1200)) - baseline_Hz ; % HRW 09232020 added for pitch adaptation
-               centdiff = baseline_Hz*(2^(DIVA_x.pertmagnitudeCENT/1200)) - baseline_Hz ; % for pitch reflex
-               DIVA_x.production_art.Aud_min(:,1) = baseline_Hz - targetcentdiff; % HRW 09232020 added for pitch adaptation
-               DIVA_x.logs.AuditoryTargetMin (:,1) = ( baseline_Hz - targetcentdiff)/100; % HRW 09232020 added for pitch adaptation
-               DIVA_x.production_art.Aud_max(:,1) = baseline_Hz + targetcentdiff; % HRW 09232020 added for pitch adaptation
-               DIVA_x.logs.AuditoryTargetMax (:,1) = ( baseline_Hz + targetcentdiff)/100; % HRW 09232020 added for pitch adaptation
-               DIVA_x.production_info.F0_min = baseline_Hz - targetcentdiff; % HRW 09232020 added for pitch adaptation
-               DIVA_x.production_info.F0_max = baseline_Hz + targetcentdiff; % HRW 09232020 added for pitch adaptation
+        DIVA_x.pertmagnitudeHz = pertmagnitude_matrix(1); % 7.9671
+               
+               %load('BCMlookuptable.mat'); %[F0,SPL]=fmBCM(a_CT,a_TA,Ps,lookuptable);
+               baseline_Hz = 133.9840; % Case B           
+               targetdiffhz = baseline_Hz*(2^(DIVA_x.targetrangeCENT/1200)) - baseline_Hz ; % HRW 09232020 added for pitch adaptation
+               pertdiffcent = 1200*log2((baseline_Hz + DIVA_x.pertmagnitudeHz)/baseline_Hz) ; % for pitch reflex
+               %Hzdiff = baseline_Hz*(2^(DIVA_x.pertmagnitudeCENT/1200)) - baseline_Hz ; % for pitch reflex
+               DIVA_x.production_art.Aud_min(:,1) = baseline_Hz - targetdiffhz; % HRW 09232020 added for pitch adaptation
+               DIVA_x.logs.AuditoryTargetMin (:,1) = ( baseline_Hz - targetdiffhz)/100; % HRW 09232020 added for pitch adaptation
+               DIVA_x.production_art.Aud_max(:,1) = baseline_Hz + targetdiffhz; % HRW 09232020 added for pitch adaptation
+               DIVA_x.logs.AuditoryTargetMax (:,1) = ( baseline_Hz + targetdiffhz)/100; % HRW 09232020 added for pitch adaptation
+               DIVA_x.production_info.F0_min = baseline_Hz - targetdiffhz; % HRW 09232020 added for pitch adaptation
+               DIVA_x.production_info.F0_max = baseline_Hz + targetdiffhz; % HRW 09232020 added for pitch adaptation
                diva_targets('save','txt',DIVA_x.production,DIVA_x.production_info); % HRW 09232020 added for pitch adaptation
                diva_targets('save','mat',DIVA_x.production,DIVA_x.production_info,0); % HRW 09232020 added for pitch adaptation
                
-               DIVA_x.pertmagnitude = centdiff;
-               DIVA_x.pertvalue = centdiff;
+               DIVA_x.pertmagnitude = pertdiffcent;
+               DIVA_x.pertvalue = pertdiffcent;
                DIVA_x.changed = 1;
                diva_gui save
-               
+               %diva_gui('init_inputoutputplots');
+               %diva_gui('update_inputoutputplots');
                
                DIVA_x.simopt=simset('OutputVariables','t');
                simout=evalin('base','sim(DIVA_x.model,[],DIVA_x.simopt)');
                 if simout(end)<time/1000 || ~strcmp(get(DIVA_x.figure.handles.button4,'string'),'Stop'), 
-                return; 
+                   return; 
                 end
-               DIVA_x.pertresults.(['trial_',num2str(nruns)]) = DIVA_x.logs.AuditoryState(36:62,1).*100; % HRW 09252020 getting mean fo of region 40ms to 120ms from vowel onset
-               DIVA_x.pertresults.meanadapt_f0HZ(nruns) = mean(DIVA_x.logs.AuditoryState(36:62,1).*100); % HRW 09262020 in Hz   
+               DIVA_x.pertresults.(['trial_',num2str(nruns)]) = [DIVA_x.logs.time*1000-550,DIVA_x.logs.AuditoryState*100]; % HRW 09252020 getting mean fo of region 40ms to 120ms from vowel onset
+               DIVA_x.pertresults.meanreflex_f0HZ(nruns) = mean(DIVA_x.logs.AuditoryState(135:159,1).*100); % HRW 09262020 in Hz   
             
-            disp(['pert value: ' ,num2str( DIVA_x.pertmagnitude),' Hz , Reflexive trial']); 
+            disp(['pert value: ' ,num2str( DIVA_x.pertmagnitudeHz),' Hz , Reflexive trial']); 
+            disp(['pert value: ' ,num2str( DIVA_x.pertmagnitude),' cents , Reflexive trial']); 
+            disp(['reflexive response: ' ,num2str( DIVA_x.pertresults.meanreflex_f0HZ(nruns)),' Hz , Reflexive trial']); 
+            
+            
             set(DIVA_x.figure.handles.button4,'string','Start','callback','diva_gui(''start'')');
             set([DIVA_x.figure.handles.button2,DIVA_x.figure.handles.field1,DIVA_x.figure.handles.field2,DIVA_x.figure.handles.list3,DIVA_x.figure.handles.button5,DIVA_x.figure.handles.button7,DIVA_x.figure.handles.button8],'enable','on');
             set(DIVA_x.figure.handles.slider,'visible','on','sliderstep',min(1,[1,10]/max(1,size(DIVA_x.logs.ArticulatoryPosition,1))));
-  
-     else
+            %diva_gui('update_inputoutputplots');
+            
+     elseif strcmp(perttype,'Auditory Adaptive Perturbation')
          
         adaptphases_index = find(strcmp(dialogPrmNames,'adaptphases')==1);
         adaptphases= get_param('diva/Auditory Perturbation', dialogPrmNames{adaptphases_index}); 
         adaptphases_matrix = str2num(adaptphases);
         DIVA_x.adaptphases = adaptphases_matrix;
         
-        adaptpert_index = find(strcmp(dialogPrmNames,'maxadaptperturbation')==1);
+        adaptpert_index = find(strcmp(dialogPrmNames,'maxadaptpert')==1);
         adaptpert= get_param('diva/Auditory Perturbation', dialogPrmNames{adaptpert_index}); 
         
-        DIVA_x.pertmagnitudeCENT = adaptpert; 
-         
-        for nrun=1:nruns
-           if (nrun == 2 && strcmp(perttype,'Auditory Adaptive Perturbation'))
-                 
-               baseline_Hz = 134.0271;               
-               targetcentdiff = baseline_Hz*(2^(DIVA_x.targetrangeCENT/1200)) - baseline_Hz ; % HRW 09232020 added for pitch adaptation
-               centdiff = baseline_Hz*(2^(DIVA_x.pertmagnitudeCENT/1200)) - baseline_Hz ; % for pitch reflex
-               DIVA_x.production_art.Aud_min(:,1) = baseline_Hz - targetcentdiff; % HRW 09232020 added for pitch adaptation
-               DIVA_x.logs.AuditoryTargetMin (:,1) = ( baseline_Hz - targetcentdiff)/100; % HRW 09232020 added for pitch adaptation
-               DIVA_x.production_art.Aud_max(:,1) = baseline_Hz + targetcentdiff; % HRW 09232020 added for pitch adaptation
-               DIVA_x.logs.AuditoryTargetMax (:,1) = ( baseline_Hz + targetcentdiff)/100; % HRW 09232020 added for pitch adaptation
-               DIVA_x.production_info.F0_min = baseline_Hz - targetcentdiff; % HRW 09232020 added for pitch adaptation
-               DIVA_x.production_info.F0_max = baseline_Hz + targetcentdiff; % HRW 09232020 added for pitch adaptation
-               diva_targets('save','txt',DIVA_x.production,DIVA_x.production_info); % HRW 09232020 added for pitch adaptation
-               diva_targets('save','mat',DIVA_x.production,DIVA_x.production_info,0); % HRW 09232020 added for pitch adaptation
-               pertvalue = [zeros(1,DIVA_x.adaptphases(1)), linspace(0,centdiff,DIVA_x.adaptphases(2)), centdiff.*ones(1,DIVA_x.adaptphases(3)),zeros(1,DIVA_x.adaptphases(4))]; % HRW 09232020 added for pitch adaptation
+        pertmagnitude_matrix = str2num(adaptpert);
+        DIVA_x.pertmagnitudeHz = pertmagnitude_matrix(1);
+        baseline_Hz = 133.9840; % Case B
+        pertdiffcent = 1200*log2((baseline_Hz + DIVA_x.pertmagnitudeHz)/baseline_Hz) ; % for pitch reflex
+        pertvalue = [zeros(1,DIVA_x.adaptphases(1)), linspace(0,DIVA_x.pertmagnitudeHz,DIVA_x.adaptphases(2)), DIVA_x.pertmagnitudeHz.*ones(1,DIVA_x.adaptphases(3)),zeros(1,DIVA_x.adaptphases(4))]; % HRW 09232020 added for pitch adaptation
+                       
+        for nrun=1:length(pertvalue)
+                                          
+               baseline_Hz = 133.9840; % Case B       %baseline_Hz = 134.0271;               
+               targetdiffhz = baseline_Hz*(2^(DIVA_x.targetrangeCENT/1200)) - baseline_Hz ; % HRW 09232020 added for pitch adaptation
+               %pertdiffcent = baseline_Hz*(2^(DIVA_x.pertmagnitudeCENT/1200)) - baseline_Hz ; % for pitch reflex
+               DIVA_x.production_art.Aud_min(:,1) = baseline_Hz - targetdiffhz; % HRW 09232020 added for pitch adaptation
+               DIVA_x.logs.AuditoryTargetMin (:,1) = ( baseline_Hz - targetdiffhz)/100; % HRW 09232020 added for pitch adaptation
+               DIVA_x.production_art.Aud_max(:,1) = baseline_Hz + targetdiffhz; % HRW 09232020 added for pitch adaptation
+               DIVA_x.logs.AuditoryTargetMax (:,1) = ( baseline_Hz + targetdiffhz)/100; % HRW 09232020 added for pitch adaptation
+               DIVA_x.production_info.F0_min = baseline_Hz - targetdiffhz; % HRW 09232020 added for pitch adaptation
+               DIVA_x.production_info.F0_max = baseline_Hz + targetdiffhz; % HRW 09232020 added for pitch adaptation
+               
+               %diva_targets('save','txt',DIVA_x.production,DIVA_x.production_info); % HRW 09232020 added for pitch adaptation
+               %diva_targets('save','mat',DIVA_x.production,DIVA_x.production_info,0); % HRW 09232020 added for pitch adaptation
+               
+               DIVA_x.pertmagnitude =  pertvalue(nrun); %important -used in simulink in Hz
                DIVA_x.pertvalue = pertvalue(nrun); % HRW 09232020 added for pitch adaptation
                DIVA_x.changed = 1;
-               diva_gui save
-           
-           else
-                               
-               baseline_Hz = 134.0271;               
-               targetcentdiff = baseline_Hz*(2^(DIVA_x.targetrangeCENT/1200)) - baseline_Hz ; % HRW 09232020 added for pitch adaptation
-               centdiff = baseline_Hz*(2^(DIVA_x.pertmagnitudeCENT/1200)) - baseline_Hz ; % for pitch reflex
-               DIVA_x.production_art.Aud_min(:,1) = baseline_Hz - targetcentdiff; % HRW 09232020 added for pitch adaptation
-               DIVA_x.logs.AuditoryTargetMin (:,1) = ( baseline_Hz - targetcentdiff)/100; % HRW 09232020 added for pitch adaptation
-               DIVA_x.production_art.Aud_max(:,1) = baseline_Hz + targetcentdiff; % HRW 09232020 added for pitch adaptation
-               DIVA_x.logs.AuditoryTargetMax (:,1) = ( baseline_Hz + targetcentdiff)/100; % HRW 09232020 added for pitch adaptation
-               DIVA_x.production_info.F0_min = baseline_Hz - targetcentdiff; % HRW 09232020 added for pitch adaptation
-               DIVA_x.production_info.F0_max = baseline_Hz + targetcentdiff; % HRW 09232020 added for pitch adaptation
-               diva_targets('save','txt',DIVA_x.production,DIVA_x.production_info); % HRW 09232020 added for pitch adaptation
-               diva_targets('save','mat',DIVA_x.production,DIVA_x.production_info,0); % HRW 09232020 added for pitch adaptation
-               
-               DIVA_x.pertmagnitude = centdiff;
-               DIVA_x.pertvalue = centdiff;
-               DIVA_x.changed = 1;
-               diva_gui save
+               %diva_gui save
                 
            
-            end
-           
+                   
            
             DIVA_x.simopt=simset('OutputVariables','t');
             simout=evalin('base','sim(DIVA_x.model,[],DIVA_x.simopt)');
             if simout(end)<time/1000 || ~strcmp(get(DIVA_x.figure.handles.button4,'string'),'Stop'), 
                 break; 
             end
-            DIVA_x.pertresults.(['trial_',num2str(nrun)]) = DIVA_x.logs.AuditoryState(36:62,1).*100; % HRW 09252020 getting mean fo of region 40ms to 120ms from vowel onset
-            DIVA_x.pertresults.meanadapt_f0HZ(nrun) = mean(DIVA_x.logs.AuditoryState(36:62,1).*100); % HRW 09262020 in Hz   
+            DIVA_x.pertresults.(['trial_',num2str(nrun)]) = DIVA_x.logs.AuditoryState(:,1).*100; % HRW 09252020 getting mean fo of region 40ms to 120ms from vowel onset
+            DIVA_x.pertresults.meanadapt_f0HZ(nrun) = mean(DIVA_x.logs.AuditoryState(8:24,1).*100); % HRW 36:62 earlier 50ms delay  
             
-            disp(['pert value: ' ,num2str(pertvalue(nrun)),' , trial: ' ,num2str(nrun)]); 
+            disp(['pert value: ' ,num2str( DIVA_x.pertvalue),' Hz , trial: ' ,num2str(nrun)]); 
         end
 
         
         set(DIVA_x.figure.handles.button4,'string','Start','callback','diva_gui(''start'')');
         set([DIVA_x.figure.handles.button2,DIVA_x.figure.handles.field1,DIVA_x.figure.handles.field2,DIVA_x.figure.handles.list3,DIVA_x.figure.handles.button5,DIVA_x.figure.handles.button7,DIVA_x.figure.handles.button8],'enable','on');
         set(DIVA_x.figure.handles.slider,'visible','on','sliderstep',min(1,[1,10]/max(1,size(DIVA_x.logs.ArticulatoryPosition,1))));
-    end
+     else % unperturbed productions prosodic contours
+             
+         
+             DIVA_x.simopt=simset('OutputVariables','t');
+             simout=evalin('base','sim(DIVA_x.model,[],DIVA_x.simopt)');
+             if simout(end)<time/1000 || ~strcmp(get(DIVA_x.figure.handles.button4,'string'),'Stop'), 
+                    return; 
+             end
+         
+             %DIVA_x.simulation(:,nrun) = DIVA_x.logs.AuditoryState(:,1).*100; % HRW 09252020 getting mean fo of region 40ms to 120ms from vowel onset
+             
+        
+         set(DIVA_x.figure.handles.button4,'string','Start','callback','diva_gui(''start'')');
+         set([DIVA_x.figure.handles.button2,DIVA_x.figure.handles.field1,DIVA_x.figure.handles.field2,DIVA_x.figure.handles.list3,DIVA_x.figure.handles.button5,DIVA_x.figure.handles.button7,DIVA_x.figure.handles.button8],'enable','on');
+         set(DIVA_x.figure.handles.slider,'visible','on','sliderstep',min(1,[1,10]/max(1,size(DIVA_x.logs.ArticulatoryPosition,1))));
+       
+     end
     case 'stop'
         set(DIVA_x.figure.handles.button4,'string','Start','callback','diva_gui(''start'')');
         set([DIVA_x.figure.handles.button2,DIVA_x.figure.handles.field1,DIVA_x.figure.handles.field2,DIVA_x.figure.handles.list3,DIVA_x.figure.handles.button5,DIVA_x.figure.handles.button7,DIVA_x.figure.handles.button8],'enable','on');
@@ -420,7 +429,7 @@ switch(lower(option)),
         maxt=max(timeseries.time)/1000;
         %DT=min(diff(timeseries.time))/1000;
         %set_param(DIVA_x.model,'StopTime',num2str(.05+maxt));%.15+DT*size(Wart,1)));
-        set_param(DIVA_x.model,'StopTime',num2str(.05+maxt));%.15+DT*size(Wart,1)));
+        set_param(DIVA_x.model,'StopTime',num2str(.12+maxt));%.15+DT*size(Wart,1)));
         
         %timeseries.Art(:,13) = 10+(timeseries.Art(:,13)*(2010-10)); %convert Ps to Pascal HW
         DIVA_x.logs.time=timeseries.time/1000;
