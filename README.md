@@ -27,10 +27,33 @@ The source code of Laryngeal DIVA model, which combines DIVA model of speech mot
 
 ## Introducing perturbations to the model
 1. Auditory reflexive or auditory adaptive perturbations of vocal *f*o can be introduced by navigating to the simulink model and opening the **auditory perturbation** block.
+2. First select the Perturbation type
+3. For Auditory Reflexive Perturbation, you can run one reflexive trial simulation. Set perturbation magnitude (in Cents), perturbation duraiton, and perturbation onset as propted. See Fig 3.
 
-![Fig_perturbationType](https://user-images.githubusercontent.com/13642912/142671793-964f0fac-fa97-48f7-b807-ec1032ec9b1a.JPG)
+![PitchReflex](https://user-images.githubusercontent.com/13642912/142690571-8db28e69-55a9-40dd-9f47-7879211a7dfa.JPG)
 <p align = "left"> <b>Figure 3. For Pitch Reflexive Perturbation: Setting perturbation magnitude, perturbation duration, and perturbation onset in Auditory Perturbation block</b></p>
 
-![Fig_perturbationType](https://user-images.githubusercontent.com/13642912/142671883-535e14af-2c44-4f14-87b3-1e88547039a9.JPG)
+4. For Auditory Adaptive Perturbation, you can run multiple trial length simulations. Set maximum perturbation magnitude (in Cents), and number of trials in each phase as propted. See Fig 4. 
+*Note: you should select the number of trials as the number of repeatitions in DIVA_GUI*
+
+![PitchAdapt](https://user-images.githubusercontent.com/13642912/142690802-c8b824c2-d2fc-4b08-ab84-cc05e46192f8.JPG)
 <p align = "left"> <b>Figure 4. For Pitch Adaptive Perturbation: Setting Phases in adaptation paradigm and max perturbation magnitude in Auditory Perturbation block</b></p>
+
+## Modifying Feedback and Feedforward Gains
+1. In the main Simulink model > select 'Articulatory Velocity and Position Map" > and click on Gain blocks to modify feedback and feedforward gains
+
+![GainControl](https://user-images.githubusercontent.com/13642912/142690174-85eea060-2c5b-49da-8834-c2fb3088da33.JPG)
+<p align = "left"> <b>Figure 5. Artucilatory Velocity and Position Map block</b></p>
+
+3. You can modify the following gain values
+   * Feedback Gain (overall) : This is set to 1 and not modified
+   * Feedforwward Gain (overall) : This is set to 1 and not modified
+   * Auditory Feedback Gain : Modify to fit auditory reflexive experiment datasets
+   ![FBgain](https://user-images.githubusercontent.com/13642912/142690287-8a008cd6-c4ac-4512-b8f3-330b64bca77e.JPG)
+   
+   * Somatosensory Feedback Gain : This is set to 0 and not modified                
+   ![FBgainsom](https://user-images.githubusercontent.com/13642912/142690309-c609400c-872a-4bd0-94d3-9f197908b06f.JPG)
+   
+   * Feedforward Learning Rate : Modify to fit auditory adaptive experiment datasets
+   ![learningrate](https://user-images.githubusercontent.com/13642912/142690324-ab3050e2-80fb-4d36-ab61-af41462dcf98.JPG)
 
